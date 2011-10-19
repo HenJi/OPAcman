@@ -1,24 +1,18 @@
 @client Ghost = {{
 
-  @server default = [
-    { ai    = {dumb}
-      base  = Base.make(5, 4, {right}, 10)
-      color = Color.orange },
-    { ai    = {guard}
-      base  = Base.make(20, 4, {down}, 10)
-      color = Color.darkred },
-    { ai    = {dumb}
-      base  = Base.make(20, 22, {left}, 10)
-      color = Color.gold },
-    { ai    = {guard}
-      base  = Base.make(5, 22, {up}, 10)
-      color = Color.green }
-  ] : list(Ghost.t)
+  make(ai, x, y, dir, color, eye_color) = {
+    ~ai ~color ~eye_color
+    base      = Base.make(x, y, dir, 10)
+    eye_step  = 0
+    eye_steps = 32
+  } : Ghost.t
 
-  invert_color(c:color) =
-    Color.set_r(c, 255-Color.r(c))
-    |> Color.set_g(_, 255-Color.g(c))
-    |> Color.set_b(_, 255-Color.b(c))
+  default = [
+    make({dumb}, 5, 4, {right}, Color.orange, Color.crimson),
+    make({guard}, 20, 4, {down}, Color.darkred, Color.gold),
+    make({dumb}, 20, 22, {left}, Color.purple, Color.silver),
+    make({guard}, 5, 22, {up}, Color.green, Color.navy),
+  ] : list(Ghost.t)
 
   draw_one(ctx:Canvas.context, g:Ghost.t) =
     w = base_size
@@ -40,12 +34,12 @@
     do Canvas.fill(ctx)
 
     do Canvas.clear_rect(ctx, -w/4, -w/4, w/2, w/4)
-    do Canvas.set_fill_style(ctx, {color=invert_color(g.color)})
+    do Canvas.set_fill_style(ctx, {color=(g.eye_color)})
     dx =
-      base = g.base.max_steps
+      base = g.eye_steps
       step =
-        if g.base.cur_step > base/2 then base - g.base.cur_step
-        else g.base.cur_step
+        if g.eye_step > base/2 then base - g.eye_step
+        else g.eye_step
       (w*step)/(2*base)
     do Canvas.fill_rect(ctx, dx-w/4, -w/4, w/4, w/4)
 
@@ -73,6 +67,7 @@
     cur_step =
       if cur_step >= g.base.max_steps then 0
       else cur_step
+    g = {g with eye_step = mod(g.eye_step+1, g.eye_steps)}
     if cur_step != 0 then {g with base = {g.base with ~cur_step}}
     else
       (dx, dy) = Base.Dir.deltas(g.base.dir)
@@ -83,7 +78,7 @@
       g = {g with base = {g.base with ~pos}}
       dirs = move_fun(g.base)
       dir = List.get(Random.int(List.length(dirs)), dirs) ? {down}
-      {g with base = {g.base with ~dir ~cur_step}}
+      {g with base = {g.base with ~dir ~cur_step} }
 
   @private move_one_dumb(ghost:Ghost.t) =
     move_one_generic(ghost, build_move_options(_, true))

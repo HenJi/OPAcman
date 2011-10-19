@@ -7,7 +7,7 @@ grid_heigth = 29
 
 /* Defaults */
 
-default_game = {
+@client default_game = {
   pacman = Pacman.default
   ghosts = Ghost.default
   food   = initial_food

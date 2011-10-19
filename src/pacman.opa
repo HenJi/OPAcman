@@ -1,10 +1,10 @@
 @client Pacman = {{
 
-  @server default = {
+  default = {
     base = Base.make(0, 0, {right}, 10)
     next_dir    = {right}
-    mouth_state = 0
-    mouth_incr  = 1
+    mouth_step = 0
+    mouth_incr = 1
     mouth_steps = 10
   } : Pacman.t
 
@@ -13,7 +13,7 @@
     p = g.pacman
     w = base_size
 
-    mouth = p.mouth_state
+    mouth = p.mouth_step
     steps = p.mouth_steps
 
     do Canvas.save(ctx)
@@ -78,13 +78,13 @@
           else (food, g.score+10)
         else (g.food, g.score)
 
-    mouth = p.mouth_state + p.mouth_incr
+    mouth = p.mouth_step + p.mouth_incr
     dmouth =
       if (mouth == p.mouth_steps-1 || mouth == 0) then -p.mouth_incr
       else p.mouth_incr
     pacman =
       { p with
-            mouth_state = mouth
+            mouth_step = mouth
             mouth_incr = dmouth
             base = { p.base with ~pos ~dir ~cur_step } }
     game.set({g with ~pacman ~food ~score})

@@ -15,7 +15,7 @@ type Base.t = {
 type Pacman.t = {
   base        : Base.t
   next_dir    : Base.direction
-  mouth_state : int
+  mouth_step  : int
   mouth_incr  : int
   mouth_steps : int
 }
@@ -25,9 +25,12 @@ type Ghost.ai =
   / {guard}
 
 type Ghost.t = {
-  ai         : Ghost.ai
-  base       : Base.t
-  color      : color
+  ai        : Ghost.ai
+  base      : Base.t
+  color     : color
+  eye_color : color
+  eye_step  : int
+  eye_steps : int
 }
 
 type Game.status = {
