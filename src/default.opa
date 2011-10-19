@@ -4,8 +4,11 @@
  * 
  * 1: Normal food
  * 2: Special food (TODO)
- * 5: Teleport - Moving the player at one end of the line will teleport it at
- *    the other end - Ghosts can't teleport. (TODO)
+ * 3: Ghost prison - There must be at least one
+      - Best if walled or in a corner
+ * 4: Ghost start point - There must be at least one
+ * 5: Teleport - Moving the player at one end of the line will
+ *    teleport it at the other end - Ghosts can't teleport.
  * 8: Wall
  */
 
@@ -21,10 +24,10 @@ grid = [
   [8,8,8,8,8,1,8,8,8,8,8,0,8,8,0,8,8,8,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,8,8,8,0,8,8,0,8,8,8,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,0,0,0,0,0,0,0,0,0,0,8,8,1,8,8,8,8,8],
-  [8,8,8,8,8,1,8,8,0,8,8,8,0,0,8,8,8,0,8,8,1,8,8,8,8,8],
+  [8,8,8,8,8,1,8,8,0,8,8,8,4,4,8,8,8,0,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,0,8,0,0,8,8,0,0,8,0,8,8,1,8,8,8,8,8],
-  [5,0,0,0,0,1,0,0,0,8,0,0,0,0,0,0,8,0,0,0,1,0,0,0,0,5],
-  [8,8,8,8,8,1,8,8,0,8,0,0,0,0,0,0,8,0,8,8,1,8,8,8,8,8],
+  [5,0,0,0,0,1,0,0,0,8,3,3,0,0,3,3,8,0,0,0,1,0,0,0,0,5],
+  [8,8,8,8,8,1,8,8,0,8,3,3,3,3,3,3,8,0,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,0,8,8,8,8,8,8,8,8,0,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,0,0,0,0,0,0,0,0,0,0,8,8,1,8,8,8,8,8],
   [8,8,8,8,8,1,8,8,0,8,8,8,8,8,8,8,8,0,8,8,1,8,8,8,8,8],
@@ -54,8 +57,9 @@ Default = {{
       grid, Set.empty:set(Base.pos))
 
   food = get_grid_nums(1)
-
   walls = get_grid_nums(8)
+  ghost_prison = get_grid_nums(3)
+  ghost_start = get_grid_nums(4)
 
   teleports =
     elts =
@@ -81,18 +85,20 @@ Default = {{
     mouth_steps = 10
   } : Pacman.t
 
-  @private make_ghost(ai, x, y, dir, color, eye_color) = {
-    ~ai ~color ~eye_color
+  @private make_ghost(ai, prison, dir, color, eye_color) =
+  ~{x y} = Set.random_get(ghost_prison) |> Option.get
+  { ~ai ~color ~eye_color
     base      = Base.make(x, y, dir, 10)
+    prison    = some(prison)
     eye_step  = 0
     eye_steps = 32
   } : Ghost.t
 
   ghosts = [
-    make_ghost({dumb}, 5, 4, {right}, Color.orange, Color.crimson),
-    make_ghost({guard}, 20, 4, {down}, Color.darkred, Color.gold),
-    make_ghost({dumb}, 20, 22, {left}, Color.purple, Color.silver),
-    make_ghost({guard}, 5, 22, {up}, Color.green, Color.navy),
+    make_ghost({dumb}, 60, {up}, Color.orange, Color.crimson),
+    make_ghost({guard}, 200, {up}, Color.darkred, Color.gold),
+    make_ghost({dumb}, 400, {up}, Color.purple, Color.silver),
+    make_ghost({guard}, 600, {up}, Color.green, Color.navy),
   ] : list(Ghost.t)
 
 }}

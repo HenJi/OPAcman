@@ -34,6 +34,9 @@ type Ghost.ai =
 type Ghost.t = {
   ai        : Ghost.ai
   base      : Base.t
+  /* Number of cycles in prison
+     NOTE: default config is 60 cycles per second */
+  prison    : option(int)
   color     : color
   eye_color : color
   eye_step  : int

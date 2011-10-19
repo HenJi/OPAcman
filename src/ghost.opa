@@ -92,11 +92,28 @@
       else bias
     move_one_generic(ghost, move_fun)
 
+  @private move_prison(ghost:Ghost.t) =
+    match ghost.prison with
+    | {none} -> ghost
+    | {some=t} ->
+      if t < 1 then
+        ~{x y} = Set.random_get(Default.ghost_start) |> Option.get
+        {ghost with
+           base = {
+             pos       = ~{x y}
+             dir       = {up}
+             cur_step  = 0
+             max_steps = ghost.base.max_steps }
+           prison = none}
+      else {ghost with prison = some(t-1)}
+
   move(g) =
     ghosts = List.map(
-      ghost -> match ghost.ai with
-        | {dumb} -> move_one_dumb(ghost)
-        | {guard} -> move_one_guard(ghost, g.pacman.base),
+      ghost ->
+        (match ghost.ai with
+         | {dumb} -> move_one_dumb(ghost)
+         | {guard} -> move_one_guard(ghost, g.pacman.base)
+        ) |> move_prison,
       g.ghosts)
     {g with ~ghosts}
 
