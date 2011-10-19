@@ -10,9 +10,16 @@
     do Canvas.restore(ctx)
     void
 
-  at(x, y) =
-    x >= grid_width || y >= grid_heigth
-    || x < 0 || y < 0
-    || Set.mem(~{x y}, Default.walls)
+  at(x, y, may_teleport) =
+    border =
+      if may_teleport then
+        if x < 0 || x >= grid_width then
+          not(List.mem({line=y}, Default.teleports))
+        else if y < 0 || y >= grid_width then
+          not(List.mem({column=x}, Default.teleports))
+        else false
+      else
+        x >= grid_width || y >= grid_heigth || x < 0 || y < 0
+    border || Set.mem(~{x y}, Default.walls)
 
 }}

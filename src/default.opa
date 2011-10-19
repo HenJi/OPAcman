@@ -54,7 +54,24 @@ Default = {{
       grid, Set.empty:set(Base.pos))
 
   food = get_grid_nums(1)
+
   walls = get_grid_nums(8)
+
+  teleports =
+    elts =
+      get_grid_nums(5)
+      |> Set.fold(
+        ~{x y}, acc -> [{line=y}|[{column=x}|acc]],
+        _, [])
+      |> List.sort
+    if elts == [] then []
+    else
+      List.fold(
+        e, (prev, acc) ->
+          if e == prev then (e, [e|acc])
+          else (e, acc),
+        List.tail(elts), (List.head(elts), []))
+      |> _.f2
 
   pacman = {
     base       = Base.make(0, 0, {right}, 10)

@@ -1,7 +1,6 @@
 @client Pacman = {{
 
-  draw(g, ctx:Canvas.context) =
-    p = g.pacman
+  @private draw_one(p:Pacman.t, ctx:Canvas.context) =
     w = base_size
 
     mouth = p.mouth_step
@@ -31,6 +30,28 @@
     do Canvas.restore(ctx)
     void
 
+  @private draw_clones(f:Base.pos->Base.pos, p1:Pacman.t, ctx:Canvas.context) =
+    p2 = {p1 with base={p1.base with pos=f(p1.base.pos)}}
+    do draw_one(p1, ctx)
+    do draw_one(p2, ctx)
+    void
+
+  draw(g, ctx:Canvas.context) =
+    p = g.pacman
+    if (p.base.dir == {left} || p.base.dir == {right})
+         && p.base.pos.x == 0 then
+      draw_clones({x=_ ~y} -> {x=grid_width ~y}, p, ctx)
+    else if (p.base.dir == {left} || p.base.dir == {right})
+         && p.base.pos.x == grid_width-1 then 
+      draw_clones({x=_ ~y} -> {x=-1 ~y}, p, ctx)
+    else if (p.base.dir == {up} || p.base.dir == {down})
+         && p.base.pos.y == 0 then 
+      draw_clones({~x y=_} -> {~x y=grid_heigth}, p, ctx)
+    else if (p.base.dir == {up} || p.base.dir == {down})
+         && p.base.pos.y == grid_heigth-1 then 
+      draw_clones({~x y=_} -> {~x y=-1}, p, ctx)
+    else draw_one(p, ctx)
+
   move(g) =
     p = g.pacman
     ignore_incr = p.base.cur_step < 0
@@ -39,7 +60,7 @@
       else if Base.Dir.is_still(p.base.dir) then 0
       else cur_step
     test_wall(on_ok, on_err, x, y) =
-      if Wall.at(x,y) then on_err
+      if Wall.at(x,y, true) then on_err
       else on_ok
     (dir, dx, dy) =
       if cur_step != 0 then (p.base.dir, 0, 0)
@@ -55,8 +76,8 @@
         if ignore_incr then (dir, 0, 0)
         else (dir, dx, dy)
     pos = {
-      x = p.base.pos.x + dx
-      y = p.base.pos.y + dy
+      x = mod(grid_width + p.base.pos.x + dx, grid_width)
+      y = mod(grid_heigth + p.base.pos.y + dy, grid_heigth)
     }
 
     (food, score) =

@@ -34,13 +34,13 @@
 
   @private build_move_options(b:Base.t, no_back) =
     all_options = [] : list(Base.direction)
-      |> (if Wall.at(b.pos.x+1, b.pos.y) then identity
+      |> (if Wall.at(b.pos.x+1, b.pos.y, false) then identity
           else List.add({right}, _))
-      |> (if Wall.at(b.pos.x-1, b.pos.y) then identity
+      |> (if Wall.at(b.pos.x-1, b.pos.y, false) then identity
           else List.add({left}, _))
-      |> (if Wall.at(b.pos.x, b.pos.y+1) then identity
+      |> (if Wall.at(b.pos.x, b.pos.y+1, false) then identity
           else List.add({down}, _))
-      |> (if Wall.at(b.pos.x, b.pos.y-1) then identity
+      |> (if Wall.at(b.pos.x, b.pos.y-1, false) then identity
           else List.add({up}, _))
     if List.length(all_options) == 1 then all_options
     else if no_back then

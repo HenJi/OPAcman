@@ -8,6 +8,10 @@ type Base.pos = {
   y : int
 }
 
+type Base.teleports =
+    { line : int }
+  / { column : int }
+
 type Base.t = {
   pos       : Base.pos
   dir       : Base.direction
