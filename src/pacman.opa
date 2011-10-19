@@ -80,11 +80,15 @@
       y = mod(grid_heigth + p.base.pos.y + dy, grid_heigth)
     }
 
-    (food, dscore) =
-      if cur_step != p.base.max_steps/2 then (g.food, 0)
-      else Food.check(pos, g.food)
+    (food, dscore, steroids) =
+      if cur_step != p.base.max_steps/2 then (g.food, 0, g.on_steroids)
+      else Food.check(pos, g.food, g.on_steroids)
     score = g.score + dscore
-
+    on_steroids = match steroids with
+      | {none} -> none
+      | {some=t} ->
+        if t < 1 then none
+        else some(t-1)
     mouth = p.mouth_step + p.mouth_incr
     dmouth =
       if (mouth == p.mouth_steps-1 || mouth == 0) then -p.mouth_incr
@@ -94,6 +98,6 @@
             mouth_step = mouth
             mouth_incr = dmouth
             base = { p.base with ~pos ~dir ~cur_step } }
-    {g with ~pacman ~food ~score}
+    {g with ~pacman ~food ~score ~on_steroids}
 
 }}

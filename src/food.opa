@@ -1,14 +1,15 @@
 @client Food = {{
 
-  check(pos, food) =
+  check(pos, food, cur_steroids) =
     match Map.extract(pos, food) with
-    | (food, {none}) -> (food, 0)
+    | (food, {none}) -> (food, 0, cur_steroids)
     | (food, {some=f}) ->
-      score = match f with
-        | {normal} -> 10
-        | {steroids} -> 100
-      if food == Map.empty then (Default.food, score+1000)
-      else (food, score)
+      (food, d) =
+        if food == Map.empty then (Default.food, 1000)
+        else (food, 0)
+      match f with
+      | {normal} -> (food, 10+d, cur_steroids)
+      | {steroids} -> (food, 100+d, some(300))
 
   draw(g, ctx:Canvas.context) =
     food = g.food

@@ -1,5 +1,8 @@
 @client Ghost = {{
 
+  @private scared_color = Color.lightsteelblue
+  @private scared_eye_color = Color.lightslategray
+
   draw_one(ctx:Canvas.context, g:Ghost.t) =
     w = base_size
 
@@ -118,6 +121,12 @@
     {g with ~ghosts}
 
   draw(g, ctx:Canvas.context) =
-    List.iter(draw_one(ctx, _), g.ghosts)
+    ghosts = match g.on_steroids with
+      | {none} -> g.ghosts
+      | {some=_} ->
+        List.map(
+          g -> {g with color=scared_color eye_color=scared_eye_color},
+          g.ghosts)
+    List.iter(draw_one(ctx, _), ghosts)
 
 }}

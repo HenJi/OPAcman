@@ -8,10 +8,11 @@ grid_heigth = List.length(grid)
 /* Defaults */
 
 default_game = {
-  pacman = Default.pacman
-  ghosts = Default.ghosts
-  food   = Default.food
-  score  = 0
+  pacman      = Default.pacman
+  ghosts      = Default.ghosts
+  food        = Default.food
+  score       = 0
+  on_steroids = none
 } : Game.status
 
 /* Game */
@@ -54,6 +55,7 @@ default_game = {
       Pacman at ({p.base.pos.x},{p.base.pos.y}), moving {"{p.base.dir}"}
       - {Map.size(g.food)} food left
       - Score: {g.score}
+      - Steroids: {g.on_steroids}
     </>
   Dom.transform([#info <- cont])
 
