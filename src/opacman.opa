@@ -100,7 +100,7 @@ default_game = {
     | (_, {some=100}) -> {p with next_dir={right}}
 
     // space (pause)
-    | (_, {some=32}) -> {p with next_dir={still}}
+    | (_, {some=32}) -> {p with next_dir=Base.Dir.get_still(p.base.dir)}
     | _ -> p
   game.set({g with pacman=p})
 

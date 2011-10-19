@@ -1,4 +1,7 @@
-type Base.direction = {still} / {up} / {down} / {left} / {right}
+type Base.direction =
+    {up} / {down} / {left} / {right}
+  / {still_up} / {still_down}
+  / {still_left} / {still_right}
 
 type Base.pos = {
   x : int

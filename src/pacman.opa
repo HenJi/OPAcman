@@ -38,7 +38,7 @@
     ignore_incr = p.base.cur_step < 0
     cur_step = p.base.cur_step + 1
     cur_step = if cur_step >= p.base.max_steps then 0
-      else if p.base.dir == {still} then 0
+      else if Base.Dir.is_still(p.base.dir) then 0
       else cur_step
     test_wall(on_ok, on_err, x, y) =
       if Wall.at(x,y) then on_err
@@ -49,10 +49,10 @@
         do print_infos(g)
         (dx, dy) = Base.Dir.deltas(p.base.dir)
         (ddx, ddy) = Base.Dir.deltas(p.next_dir)
-        dir = test_wall(p.next_dir, {still},
+        dir = test_wall(p.next_dir, Base.Dir.get_still(p.next_dir),
                         p.base.pos.x+dx+ddx, p.base.pos.y+dy+ddy)
         (dx, dy, dir) =
-          test_wall((dx,dy,dir), (0,0,{still}),
+          test_wall((dx,dy,dir), (0,0,Base.Dir.get_still(dir)),
                     p.base.pos.x+dx, p.base.pos.y+dy)
         if ignore_incr then (dir, 0, 0)
         else (dir, dx, dy)

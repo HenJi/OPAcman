@@ -4,11 +4,10 @@
 
     facing_angle(dir:Base.direction) =
       match dir with
-      | {up}    -> -Math.PI/2.
-      | {down}  -> Math.PI/2.
-      | {left}  -> Math.PI
-      | {right} -> 0.
-      | {still} -> 0.
+      | {up}    | {still_up}    -> -Math.PI/2.
+      | {down}  | {still_down}  -> Math.PI/2.
+      | {left}  | {still_left}  -> Math.PI
+      | {right} | {still_right} -> 0.
 
     deltas(dir:Base.direction) =
       match dir with
@@ -16,7 +15,7 @@
       | {down}  -> (0, 1)
       | {left}  -> (-1, 0)
       | {right} -> (1, 0)
-      | {still} -> (0, 0)
+      | _ -> (0, 0)
 
     back(dir:Base.direction):Base.direction =
       match dir with
@@ -24,6 +23,20 @@
       | {down}  -> {up}
       | {left}  -> {right}
       | {right} -> {left}
+      | x -> x
+
+    is_still(dir:Base.direction) =
+      match dir with
+      | {still_up}   | {still_down}
+      | {still_left} | {still_right} -> true
+      | _ -> false
+
+    get_still(dir:Base.direction) =
+      match dir with
+      | {up}    -> {still_up}
+      | {down}  -> {still_down}
+      | {left}  -> {still_left}
+      | {right} -> {still_right}
       | x -> x
 
   }}
