@@ -1,3 +1,5 @@
+import stdlib.web.canvas
+
 /* Config */
 
 fps = 60
@@ -125,6 +127,7 @@ body() =
     </canvas>
     <div>
       <span id="info" onready={_ -> init()}></span>
+      <span id="debug"></span>
     </div>
   </>
 

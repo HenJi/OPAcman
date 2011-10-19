@@ -13,19 +13,11 @@
     alpha = Base.Dir.facing_angle(p.base.dir)
     do Canvas.rotate(ctx, alpha)
 
-    angle = Math.PI*Int.to_float((steps-mouth)/(3*steps))
-    x = Int.of_float(Float.of_int(w)*Math.cos(angle)/2.)-1
-    y = (w*(steps-mouth))/(4*steps)
-
+    angle = Math.PI*Int.to_float(steps-mouth)/Int.to_float(5*steps)
+    
     do Canvas.begin_path(ctx)
     do Canvas.move_to(ctx, -w/10, 0)
-    // Could replace all curves but currently not available in OPA :(
-    // do Canvas.arc(0, 0, w/2, -angle, angle, 1)
-    do Canvas.line_to(ctx, x, y)
-    do Canvas.quadratic_curve_to(ctx, w/2, w/2, 0, w/2)
-    do Canvas.quadratic_curve_to(ctx, -w/2, w/2, -w/2, 0)
-    do Canvas.quadratic_curve_to(ctx, -w/2, -w/2, 0, -w/2)
-    do Canvas.quadratic_curve_to(ctx, w/2, -w/2, x, -y)
+    do Canvas.arc(ctx, 0, 0, w/2, -angle, angle, true)
     do Canvas.fill(ctx)
     do Canvas.restore(ctx)
     void
