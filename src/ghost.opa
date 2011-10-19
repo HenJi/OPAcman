@@ -99,8 +99,10 @@
         else false
       bias = List.filter(can_see, opts)
       if bias == [] then
-        back = Base.Dir.back(bg.dir)
-        List.filter(x -> x!=back, opts)
+        if List.length(opts) == 1 then opts
+        else
+          back = Base.Dir.back(bg.dir)
+          List.filter(x -> x!=back, opts)
       else bias
     move_one_generic(ghost, move_fun)
 
