@@ -1,19 +1,5 @@
 @client Ghost = {{
 
-  make(ai, x, y, dir, color, eye_color) = {
-    ~ai ~color ~eye_color
-    base      = Base.make(x, y, dir, 10)
-    eye_step  = 0
-    eye_steps = 32
-  } : Ghost.t
-
-  default = [
-    make({dumb}, 5, 4, {right}, Color.orange, Color.crimson),
-    make({guard}, 20, 4, {down}, Color.darkred, Color.gold),
-    make({dumb}, 20, 22, {left}, Color.purple, Color.silver),
-    make({guard}, 5, 22, {up}, Color.green, Color.navy),
-  ] : list(Ghost.t)
-
   draw_one(ctx:Canvas.context, g:Ghost.t) =
     w = base_size
 

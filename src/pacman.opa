@@ -1,13 +1,5 @@
 @client Pacman = {{
 
-  default = {
-    base = Base.make(0, 0, {right}, 10)
-    next_dir    = {right}
-    mouth_step = 0
-    mouth_incr = 1
-    mouth_steps = 10
-  } : Pacman.t
-
   draw(ctx:Canvas.context) =
     g = game.get()
     p = g.pacman
@@ -74,7 +66,7 @@
       else
         if Set.mem(pos, g.food) then
           food = Set.remove(pos, g.food)
-          if food == Set.empty then (initial_food, g.score+1010)
+          if food == Set.empty then (Default.food, g.score+1010)
           else (food, g.score+10)
         else (g.food, g.score)
 

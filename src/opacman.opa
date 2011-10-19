@@ -2,15 +2,15 @@
 
 fps = 60
 base_size = 32
-grid_width  = 26
-grid_heigth = 29
+grid_width  = List.length(List.head(grid))
+grid_heigth = List.length(grid)
 
 /* Defaults */
 
-@client default_game = {
-  pacman = Pacman.default
-  ghosts = Ghost.default
-  food   = initial_food
+default_game = {
+  pacman = Default.pacman
+  ghosts = Default.ghosts
+  food   = Default.food
   score  = 0
 } : Game.status
 
