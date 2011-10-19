@@ -15,7 +15,7 @@
       if may_teleport then
         if x < 0 || x >= grid_width then
           not(List.mem({line=y}, Default.teleports))
-        else if y < 0 || y >= grid_width then
+        else if y < 0 || y >= grid_heigth then
           not(List.mem({column=x}, Default.teleports))
         else false
       else
