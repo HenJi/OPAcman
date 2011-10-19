@@ -52,7 +52,7 @@ default_game = {
   cont =
     <>
       Pacman at ({p.base.pos.x},{p.base.pos.y}), moving {"{p.base.dir}"}
-      - {Set.size(g.food)} food left
+      - {Map.size(g.food)} food left
       - Score: {g.score}
     </>
   Dom.transform([#info <- cont])

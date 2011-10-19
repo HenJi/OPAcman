@@ -35,7 +35,7 @@ type Ghost.t = {
   ai        : Ghost.ai
   base      : Base.t
   /* Number of cycles in prison
-     NOTE: default config is 60 cycles per second */
+     NOTE: moving takes 10 cycles */
   prison    : option(int)
   color     : color
   eye_color : color
@@ -43,9 +43,13 @@ type Ghost.t = {
   eye_steps : int
 }
 
+type Food.t =
+    {normal}
+  / {steroids}
+
 type Game.status = {
   pacman      : Pacman.t
   ghosts      : list(Ghost.t)
-  food        : set(Base.pos)
+  food        : map(Base.pos, Food.t)
   score       : int
 }

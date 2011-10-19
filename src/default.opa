@@ -56,10 +56,19 @@ Default = {{
           l, acc),
       grid, Set.empty:set(Base.pos))
 
-  food = get_grid_nums(1)
   walls = get_grid_nums(8)
   ghost_prison = get_grid_nums(3)
   ghost_start = get_grid_nums(4)
+
+  food =
+    normal = get_grid_nums(1)
+    steroids = get_grid_nums(2)
+    aux(set, t, acc) =
+      Set.fold(
+        p, acc -> Map.add(p, t, acc),
+        set, acc)
+    aux(normal, {normal}, Map.empty:map(Base.pos, Food.t))
+    |> aux(steroids, {steroids}, _)
 
   teleports =
     elts =

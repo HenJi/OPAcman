@@ -80,14 +80,10 @@
       y = mod(grid_heigth + p.base.pos.y + dy, grid_heigth)
     }
 
-    (food, score) =
-      if cur_step != p.base.max_steps/2 then (g.food, g.score)
-      else
-        if Set.mem(pos, g.food) then
-          food = Set.remove(pos, g.food)
-          if food == Set.empty then (Default.food, g.score+1010)
-          else (food, g.score+10)
-        else (g.food, g.score)
+    (food, dscore) =
+      if cur_step != p.base.max_steps/2 then (g.food, 0)
+      else Food.check(pos, g.food)
+    score = g.score + dscore
 
     mouth = p.mouth_step + p.mouth_incr
     dmouth =
