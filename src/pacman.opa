@@ -1,7 +1,6 @@
 @client Pacman = {{
 
-  draw(ctx:Canvas.context) =
-    g = game.get()
+  draw(g, ctx:Canvas.context) =
     p = g.pacman
     w = base_size
 
@@ -32,8 +31,7 @@
     do Canvas.restore(ctx)
     void
 
-  move() =
-    g = game.get()
+  move(g) =
     p = g.pacman
     ignore_incr = p.base.cur_step < 0
     cur_step = p.base.cur_step + 1
@@ -79,6 +77,6 @@
             mouth_step = mouth
             mouth_incr = dmouth
             base = { p.base with ~pos ~dir ~cur_step } }
-    game.set({g with ~pacman ~food ~score})
+    {g with ~pacman ~food ~score}
 
 }}

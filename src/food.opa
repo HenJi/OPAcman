@@ -1,7 +1,7 @@
 @client Food = {{
 
-  draw(ctx:Canvas.context) =
-    food = game.get().food
+  draw(g, ctx:Canvas.context) =
+    food = g.food
     w = base_size
     do Canvas.save(ctx)
     do Canvas.set_fill_style(ctx, {color=Color.red})

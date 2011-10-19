@@ -58,14 +58,15 @@ default_game = {
   Dom.transform([#info <- cont])
 
 @client next_frame(ctx:Canvas.context)() =
+  g = game.get()
+   |> Pacman.move
+   |> Ghost.move
   do clean_frame(ctx)
-  do Pacman.move()
-  do Ghost.move()
   do Wall.draw(ctx)
-  do Food.draw(ctx)
-  do Pacman.draw(ctx)
-  do Ghost.draw(ctx)
-  void
+  do Food.draw(g, ctx)
+  do Pacman.draw(g, ctx)
+  do Ghost.draw(g, ctx)
+  game.set(g)
 
 @client keyfun(e) =
   g = game.get()

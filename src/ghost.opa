@@ -92,17 +92,15 @@
       else bias
     move_one_generic(ghost, move_fun)
 
-  move() =
-    g = game.get()
+  move(g) =
     ghosts = List.map(
       ghost -> match ghost.ai with
         | {dumb} -> move_one_dumb(ghost)
         | {guard} -> move_one_guard(ghost, g.pacman.base),
       g.ghosts)
-    game.set({g with ~ghosts})
+    {g with ~ghosts}
 
-  draw(ctx:Canvas.context) =
-    g = game.get()
+  draw(g, ctx:Canvas.context) =
     List.iter(draw_one(ctx, _), g.ghosts)
 
 }}
