@@ -95,7 +95,7 @@ default_game = {
     // d
     | ({left}, {some=100}) ->
         {p with next_dir={right}
-                base={p.base with dir={left}
+                base={p.base with dir={right}
                                   cur_step=-p.base.cur_step}}
     | (_, {some=100}) -> {p with next_dir={right}}
 

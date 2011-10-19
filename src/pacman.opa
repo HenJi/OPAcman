@@ -63,7 +63,7 @@
       if Wall.at(x,y) then on_err
       else on_ok
     (dir, dx, dy) =
-      if cur_step != 0 || ignore_incr then (p.base.dir, 0, 0)
+      if cur_step != 0 then (p.base.dir, 0, 0)
       else
         do print_infos(g)
         (dx, dy) = Base.Dir.deltas(p.base.dir)
@@ -73,7 +73,8 @@
         (dx, dy, dir) =
           test_wall((dx,dy,dir), (0,0,{still}),
                     p.base.pos.x+dx, p.base.pos.y+dy)
-        (dir, dx, dy)
+        if ignore_incr then (dir, 0, 0)
+        else (dir, dx, dy)
     pos = {
       x = p.base.pos.x + dx
       y = p.base.pos.y + dy
