@@ -14,7 +14,6 @@
     w = base_size
 
     mouth = p.mouth_state
-    dmouth = p.mouth_incr
     steps = p.mouth_steps
 
     do Canvas.save(ctx)
@@ -39,16 +38,6 @@
     do Canvas.quadratic_curve_to(ctx, w/2, -w/2, x, -y)
     do Canvas.fill(ctx)
     do Canvas.restore(ctx)
-
-    mouth = mouth + dmouth;
-    dmouth =
-      if (mouth == steps-1 || mouth == 0) then -dmouth
-      else dmouth
-    do game.set({g with pacman = {
-        p with
-          mouth_state = mouth
-          mouth_incr = dmouth
-      }})
     void
 
   move() =
@@ -79,6 +68,7 @@
       x = p.base.pos.x + dx
       y = p.base.pos.y + dy
     }
+
     (food, score) =
       if cur_step != p.base.max_steps/2 then (g.food, g.score)
       else
@@ -87,8 +77,16 @@
           if food == Set.empty then (initial_food, g.score+1010)
           else (food, g.score+10)
         else (g.food, g.score)
-    pacman = {p with base = { p.base with
-      ~pos ~dir ~cur_step }}
+
+    mouth = p.mouth_state + p.mouth_incr
+    dmouth =
+      if (mouth == p.mouth_steps-1 || mouth == 0) then -p.mouth_incr
+      else p.mouth_incr
+    pacman =
+      { p with
+            mouth_state = mouth
+            mouth_incr = dmouth
+            base = { p.base with ~pos ~dir ~cur_step } }
     game.set({g with ~pacman ~food ~score})
 
 }}
