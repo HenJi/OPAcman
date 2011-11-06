@@ -72,7 +72,7 @@
     }
 
     (food, dscore, steroids) =
-      if cur_step != p.base.max_steps/2 then (g.food, 0, g.on_steroids)
+      if cur_step != p.base.max_steps/4 then (g.food, 0, g.on_steroids)
       else Food.check(pos, g.food, g.on_steroids)
     score = g.score + dscore
     lives = g.lives + (score/life_points - g.score/life_points)
