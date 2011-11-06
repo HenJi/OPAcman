@@ -94,20 +94,20 @@ Default = {{
     mouth_steps = 10
   } : Pacman.t
 
-  @private make_ghost(ai, prison, dir, color, eye_color) =
+  @private make_ghost(ai, prison, color, eye_color) =
   ~{x y} = Set.random_get(ghost_prison) |> Option.get
   { ~ai ~color ~eye_color
-    base      = Base.make(x, y, dir, 11)
+    base      = Base.make(x, y, {up}, 11)
     prison    = some(prison)
     eye_step  = 0
     eye_steps = 32
   } : Ghost.t
 
   ghosts = [
-    make_ghost({dumb}, 60, {up}, Color.orange, Color.crimson),
-    make_ghost({guard}, 200, {up}, Color.darkred, Color.gold),
-    make_ghost({dumb}, 400, {up}, Color.purple, Color.silver),
-    make_ghost({guard}, 600, {up}, Color.green, Color.navy),
-  ] : list(Ghost.t)
+    ("g1", make_ghost({dumb}, 60, Color.orange, Color.crimson)),
+    ("g2", make_ghost({guard}, 200, Color.darkred, Color.gold)),
+    ("g3", make_ghost({dumb}, 400, Color.purple, Color.silver)),
+    ("g4", make_ghost({guard}, 600, Color.green, Color.navy)),
+  ] : list((string,Ghost.t))
 
 }}

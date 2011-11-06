@@ -33,7 +33,7 @@
 
     do match g.on_steroids with
       | {none} -> void
-      | {some=d} -> cft("Bonus: {1+d/fps}s", 30)
+      | {some=s} -> cft("Bonus: {1+s.cycles/fps}s", 30)
 
     do Canvas.restore(ctx)
 

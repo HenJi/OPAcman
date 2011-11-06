@@ -44,7 +44,7 @@
       draw_clones({~x y=_} -> {~x y=-1}, p, ctx)
     else draw_one(p, ctx)
 
-  move(g) =
+  move(g:Game.status) =
     p = g.pacman
     ignore_incr = p.base.cur_step < 0
     cur_step = p.base.cur_step + 1
@@ -78,9 +78,9 @@
     lives = g.lives + (score/life_points - g.score/life_points)
     on_steroids = match steroids with
       | {none} -> none
-      | {some=t} ->
-        if t < 1 then none
-        else some(t-1)
+      | {some=s} ->
+        if s.cycles < 1 then none
+        else some({s with cycles=s.cycles-1})
     mouth = p.mouth_step + p.mouth_incr
     dmouth =
       if (mouth == p.mouth_steps-1 || mouth == 0) then -p.mouth_incr

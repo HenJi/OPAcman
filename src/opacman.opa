@@ -54,28 +54,50 @@ default_game = {
   do Canvas.restore(ctx)
   void
 
-check_collision(g) =
+check_collision(g:Game.status):Game.status =
   pc = Base.center(g.pacman.base)
   has_collision = List.fold(
-    ghost, res ->
-      if res then res
+    (gid, ghost), res ->
+      if Option.is_some(res) then res
       else
         gc = Base.center(ghost.base)
         x = gc.f1 - pc.f1
         y = gc.f2 - pc.f2
         d = Math.sqrt_i(x*x+y*y)
-        d < base_size,
-    g.ghosts, false)
-  if has_collision && g.lives == 1 then
-    {g with
-      state = {game_over}
-      lives = 0}
-  else if has_collision then
-    {default_game with
-      food = g.food
-      score = g.score
-      lives = g.lives-1}
-  else g
+        if d < base_size then some(gid)
+        else res,
+    g.ghosts, none)
+  if Option.is_none(has_collision) then g
+  else
+    match g.on_steroids with
+    | {some=s} ->
+      cid = Option.get(has_collision)
+      on_steroids = some({s with combo=s.combo+1})
+      ghosts = List.map(
+        (gid, ghost) ->
+          if gid != cid then (gid, ghost)
+          else
+            ~{x y} =
+              Set.random_get(Default.ghost_prison)
+              |> Option.get
+            base = Base.make(x, y, {up}, 11)
+            prison = some(300)
+            (gid, {ghost with ~base ~prison}),
+        g.ghosts)
+      score = g.score + (match s.combo with
+        | 0 ->  100 | 1 ->  200 | 3 ->  500 | _ -> 1000)
+      lives = g.lives + (score/life_points - g.score/life_points)
+      {g with ~ghosts ~score ~lives ~on_steroids}
+    | {none} ->
+      if g.lives == 1 then
+        {g with
+          state = {game_over}
+          lives = 0}
+      else
+        {default_game with
+          food = g.food
+          score = g.score
+          lives = g.lives-1}
 
 @client clean_frame(ctx:Canvas.context) =
   Canvas.clear_rect(

@@ -56,9 +56,10 @@ type Game.state =
 type Game.status = {
   state       : Game.state
   pacman      : Pacman.t
-  ghosts      : list(Ghost.t)
+  ghosts      : list((string, Ghost.t))
   food        : map(Base.pos, Food.t)
   score       : int
   lives       : int
-  on_steroids : option(int) /* Number of cycles on steroids */
+  on_steroids : option({cycles:int combo:int})
+    /* Number of cycles on steroids and ghost combo */
 }

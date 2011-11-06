@@ -9,7 +9,15 @@
         else (food, 0)
       match f with
       | {normal} -> (food, food_points+d, cur_steroids)
-      | {steroids} -> (food, steroid_points+d, some(steroid_len))
+      | {steroids} ->
+        new_steroids = match cur_steroids with
+          | {none} ->
+            {cycles = steroid_len
+             combo = 0}
+          | {some=s} ->
+            {cycles = s.cycles+steroid_len
+             combo = s.combo}
+        (food, steroid_points+d, some(new_steroids))
 
   draw(g, ctx:Canvas.context) =
     food = g.food

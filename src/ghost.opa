@@ -110,22 +110,24 @@
            prison = none}
       else {ghost with prison = some(t-1)}
 
-  move(g) =
+  move(g:Game.status) =
     ghosts = List.map(
-      ghost ->
-        (match ghost.ai with
-         | {dumb} -> move_one_dumb(ghost)
-         | {guard} -> move_one_guard(ghost, g.pacman.base)
-        ) |> move_prison,
+      (gid, ghost) ->
+        ghost =
+          (match ghost.ai with
+           | {dumb} -> move_one_dumb(ghost)
+           | {guard} -> move_one_guard(ghost, g.pacman.base)
+          ) |> move_prison
+        (gid, ghost),
       g.ghosts)
     {g with ~ghosts}
 
   draw(g, ctx:Canvas.context) =
     ghosts = match g.on_steroids with
-      | {none} -> g.ghosts
+      | {none} -> List.map(_.f2, g.ghosts)
       | {some=_} ->
         List.map(
-          g -> {g with color=scared_color eye_color=scared_eye_color},
+          g -> {g.f2 with color=scared_color eye_color=scared_eye_color},
           g.ghosts)
     List.iter(draw_one(ctx, _), ghosts)
 
