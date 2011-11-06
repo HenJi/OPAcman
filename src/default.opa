@@ -87,7 +87,7 @@ Default = {{
       |> _.f2
 
   pacman = {
-    base       = Base.make(0, 0, {right}, 10)
+    base       = Base.make(13, 16, {right}, 10)
     next_dir   = {right}
     mouth_step = 0
     mouth_incr = 1
