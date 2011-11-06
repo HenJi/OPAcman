@@ -143,9 +143,15 @@
   draw(g, ctx:Canvas.context) =
     ghosts = match g.on_steroids with
       | {none} -> List.map(_.f2, g.ghosts)
-      | {some=_} ->
+      | {some={~cycles combo=_}} ->
+        default = (scared_color, scared_eye_color)
+        inverted = (scared_eye_color, scared_color)
+        (color, eye_color) =
+          if cycles > 104 then default
+          else if mod(cycles, 30) > 15 then default
+          else inverted
         List.map(
-          g -> {g.f2 with color=scared_color eye_color=scared_eye_color},
+          g -> {g.f2 with ~color ~eye_color},
           g.ghosts)
     List.iter(draw_one(ctx, _), ghosts)
 
