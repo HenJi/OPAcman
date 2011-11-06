@@ -50,6 +50,7 @@ type Food.t =
 type Game.state =
     {initiating:int}
   / {running}
+  / {pause}
   / {game_over}
 
 type Game.status = {

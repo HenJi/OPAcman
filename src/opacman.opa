@@ -66,10 +66,15 @@ check_collision(g) =
         d = Math.sqrt_i(x*x+y*y)
         d < base_size,
     g.ghosts, false)
-  if has_collision then
+  if has_collision && g.lives == 1 then
     {g with
       state = {game_over}
       lives = 0}
+  else if has_collision then
+    {default_game with
+      food = g.food
+      score = g.score
+      lives = g.lives-1}
   else g
 
 @client clean_frame(ctx:Canvas.context) =
@@ -98,6 +103,9 @@ check_collision(g) =
   g = match g.state with
     | {game_over} ->
       do blink(->Info.draw_game_over(ctx))
+      g
+    | {pause} ->
+      do blink(->Info.draw_pause(ctx))
       g
     | {initiating=t} ->
       if t < -fps/2 then {g with state={running}}
@@ -143,12 +151,15 @@ check_collision(g) =
                                   cur_step=-p.base.cur_step}}
     | (_, {some=100}) -> {p with next_dir={right}}
 
-    // space (pause)
-    | (_, {some=32}) -> {p with next_dir=Base.Dir.get_still(p.base.dir)}
     | _ -> p
   g = match (g.state, e.key_code) with
     // r (reset if game over)
     | ({game_over}, {some=114}) -> default_game
+
+    // space (pause toggle)
+    | ({running}, {some=32}) -> {g with state={pause}}
+    | ({pause}, {some=32}) -> {g with state={running}}
+
     | _ -> {g with pacman=p}
   game.set(g)
 

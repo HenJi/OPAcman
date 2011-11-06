@@ -35,21 +35,41 @@
       | {none} -> void
       | {some=d} -> cft("Bonus: {1+d/fps}s", 30)
 
+    do Canvas.restore(ctx)
+
+    do Canvas.save(ctx)
+    do Canvas.set_font(ctx, "bold 20px Arial")
+    do Canvas.translate(ctx, 2+base_size*grid_width, 0)
     p = g.pacman.base.pos
     do Canvas.fill_text(ctx,
+      "Move with", 10, info_height-100)
+    do Canvas.fill_text(ctx,
+      "'wasd' or 'zqsd'", 10, info_height-70)
+    do Canvas.fill_text(ctx,
+      "'space': pause", 10, info_height-40)
+    do Canvas.fill_text(ctx,
       "Player at ({p.x},{p.y})", 10, info_height-10)
-
     do Canvas.restore(ctx)
+
     void
 
-  draw_in_center(ctx, text) =
+  draw_in_center(ctx, text, caption) =
     f = 70
     w=2+base_size*grid_width
     h=2+base_size*grid_heigth
     do Canvas.save(ctx)
+
     do Canvas.set_text_align(ctx, {align_center})
     do Canvas.set_font(ctx, "bold {f}px Arial")
     do Canvas.fill_text(ctx, text, w/2, (h-f)/2)
+
+    do match caption with
+      | {none} -> void
+      | {some=t} ->
+        do Canvas.set_font(ctx, "bold {f/2}px Arial")
+        do Canvas.fill_text(ctx, t, w/2, h/2)
+        void
+
     do Canvas.restore(ctx)
     void
 
@@ -57,9 +77,13 @@
     text =
       if t < 0 then "Go!"
       else "Starts in {1+t/fps}s"
-    draw_in_center(ctx, text)
+    draw_in_center(ctx, text, none)
 
   draw_game_over(ctx) =
-    draw_in_center(ctx, "GAME OVER")
+    draw_in_center(ctx, "GAME OVER", some("'r' to restart"))
+
+  draw_pause(ctx) =
+    draw_in_center(ctx, "PAUSE", some("'space' to resume"))
+
 
 }}
