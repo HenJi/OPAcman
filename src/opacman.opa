@@ -10,7 +10,7 @@ info_width = 200
 
 food_points = 10
 steroid_points = 100
-steroid_len = 300 /* frames */
+steroid_len = 5*fps /* frames */
 clear_bonus = 500
 life_points = 2500
 
@@ -18,6 +18,7 @@ life_points = 2500
 /* Defaults */
 
 default_game = {
+  state       = {initiating=2*fps}
   pacman      = Default.pacman
   ghosts      = Default.ghosts
   food        = Default.food
@@ -65,7 +66,10 @@ check_collision(g) =
         d = Math.sqrt_i(x*x+y*y)
         d < base_size,
     g.ghosts, false)
-  if has_collision then {g with lives=0}
+  if has_collision then
+    {g with
+      state = {game_over}
+      lives = 0}
   else g
 
 @client clean_frame(ctx:Canvas.context) =
@@ -75,20 +79,30 @@ check_collision(g) =
     2+base_size*grid_heigth)
 
 @client next_frame(ctx:Canvas.context)() =
-  g = game.get()
-  if g.lives == 0 then
-    void
-  else
-    g = Pacman.move(g)
-     |> Ghost.move
-     |> check_collision
+  draw_board(g) =
     do clean_frame(ctx)
     do Wall.draw(ctx)
     do Food.draw(g, ctx)
     do Pacman.draw(g, ctx)
     do Ghost.draw(g, ctx)
     do Info.draw(g, ctx)
-    game.set(g)
+    void
+  g = game.get()
+  do draw_board(g)
+  g = match g.state with
+    | {game_over} ->
+      do Info.draw_game_over(ctx)
+      g
+    | {initiating=t} ->
+      if t < -fps/2 then {g with state={running}}
+      else
+        do Info.draw_init(t, ctx)
+        {g with state={initiating=(t-1)}}
+    | {running} ->
+      Pacman.move(g)
+      |> Ghost.move
+      |> check_collision
+  game.set(g)
 
 @client keyfun(e) =
   g = game.get()

@@ -47,7 +47,13 @@ type Food.t =
     {normal}
   / {steroids}
 
+type Game.state =
+    {initiating:int}
+  / {running}
+  / {game_over}
+
 type Game.status = {
+  state       : Game.state
   pacman      : Pacman.t
   ghosts      : list(Ghost.t)
   food        : map(Base.pos, Food.t)
