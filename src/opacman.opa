@@ -78,6 +78,12 @@ check_collision(g) =
     2+base_size*grid_width,
     2+base_size*grid_heigth)
 
+@client blink(f) =
+  t = Date.now() |> Date.in_milliseconds
+  t = t / 100
+  t = t - (t/10)*10
+  if t > 5 then f()
+
 @client next_frame(ctx:Canvas.context)() =
   draw_board(g) =
     do clean_frame(ctx)
@@ -91,12 +97,12 @@ check_collision(g) =
   do draw_board(g)
   g = match g.state with
     | {game_over} ->
-      do Info.draw_game_over(ctx)
+      do blink(->Info.draw_game_over(ctx))
       g
     | {initiating=t} ->
       if t < -fps/2 then {g with state={running}}
       else
-        do Info.draw_init(t, ctx)
+        do blink(->Info.draw_init(t, ctx))
         {g with state={initiating=(t-1)}}
     | {running} ->
       Pacman.move(g)
@@ -107,16 +113,17 @@ check_collision(g) =
 @client keyfun(e) =
   g = game.get()
   p = g.pacman
+  do Dom.transform([#debug <- "{e.key_code}"])
   p = match (p.base.dir, e.key_code) with
-    // z
-    | ({down}, {some=122}) ->
+    // z + w
+    | ({down}, {some=122}) | ({down}, {some=119}) ->
         {p with next_dir={up}
                 base={p.base with dir={up}
                                   cur_step=-p.base.cur_step}}
     | (_, {some=122}) -> {p with next_dir={up}}
 
-    // q
-    | ({right}, {some=113}) ->
+    // q + a
+    | ({right}, {some=113}) | ({right}, {some=97}) ->
         {p with next_dir={left}
                 base={p.base with dir={left}
                                   cur_step=-p.base.cur_step}}
@@ -139,7 +146,11 @@ check_collision(g) =
     // space (pause)
     | (_, {some=32}) -> {p with next_dir=Base.Dir.get_still(p.base.dir)}
     | _ -> p
-  game.set({g with pacman=p})
+  g = match (g.state, e.key_code) with
+    // r (reset if game over)
+    | ({game_over}, {some=114}) -> default_game
+    | _ -> {g with pacman=p}
+  game.set(g)
 
 @client init() =
   match Canvas.get(#game_holder) with

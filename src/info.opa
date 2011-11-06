@@ -14,22 +14,30 @@
 
     do Canvas.set_text_align(ctx, {align_center})
     do Canvas.set_font(ctx, "bold 40px Arial")
-    cft(t,x,y) =  Canvas.fill_text(ctx, t, x, y)
-    do cft("OPAcman", info_width/2, 50)
+    do Canvas.fill_text(ctx, "OPAcman", info_width/2, 50)
 
     do Canvas.set_text_align(ctx, {align_start})
     do Canvas.set_font(ctx, "bold 20px Arial")
+    do Canvas.translate(ctx, 10, 70)
 
-    do cft("Lives: {g.lives}", 10, 100)
-    do cft("Score: {g.score}", 10, 130)
-    do cft("Food left: {Map.size(g.food)}", 10, 160)
+    cft(t,dy) =
+      do Canvas.translate(ctx, 0, dy)
+      Canvas.fill_text(ctx, t, 0, 0)
+
+    do cft("Lives: {g.lives}", 30)
+    do cft("Score: {g.score}", 30)
+    do cft("Food left: {Map.size(g.food)}", 30)
+
+    do if g.state == {game_over} then
+      cft("'r': restart", 30)
 
     do match g.on_steroids with
       | {none} -> void
-      | {some=d} -> cft("Bonus: {1+d/fps}s", 10, 190)
+      | {some=d} -> cft("Bonus: {1+d/fps}s", 30)
 
     p = g.pacman.base.pos
-    do cft("Player at ({p.x},{p.y})", 10, info_height-10)
+    do Canvas.fill_text(ctx,
+      "Player at ({p.x},{p.y})", 10, info_height-10)
 
     do Canvas.restore(ctx)
     void
@@ -51,6 +59,7 @@
       else "Starts in {1+t/fps}s"
     draw_in_center(ctx, text)
 
-  draw_game_over(ctx) = draw_in_center(ctx, "GAME OVER")
+  draw_game_over(ctx) =
+    draw_in_center(ctx, "GAME OVER")
 
 }}
