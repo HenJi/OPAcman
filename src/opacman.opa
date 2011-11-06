@@ -81,7 +81,7 @@ check_collision(g:Game.status):Game.status =
               Set.random_get(Default.ghost_prison)
               |> Option.get
             base = Base.make(x, y, {up}, 11)
-            prison = some(300)
+            prison = some(100)
             (gid, {ghost with ~base ~prison}),
         g.ghosts)
       score = g.score + (match s.combo with

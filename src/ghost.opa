@@ -72,7 +72,7 @@
   @private move_one_dumb(ghost:Ghost.t) =
     move_one_generic(ghost, build_move_options(_, true))
 
-  @private move_one_guard(ghost:Ghost.t, bp:Base.t) =
+  @private move_one_guard(ghost:Ghost.t, bp:Base.t, flee) =
     move_fun(bg) =
       opts = build_move_options(bg, false)
       can_see(dir) =
@@ -86,13 +86,18 @@
         else if bg.pos.y == bp.pos.y && bg.pos.x < bp.pos.x
                 && dir == {right} then true
         else false
-      bias = List.filter(can_see, opts)
+      bias = List.filter(
+        dir -> if flee then not(can_see(dir)) else can_see(dir),
+        opts)
       if bias == [] then
         if List.length(opts) == 1 then opts
         else
           back = Base.Dir.back(bg.dir)
           List.filter(x -> x!=back, opts)
-      else bias
+      else if List.length(bias) == 1 then bias
+      else
+        back = Base.Dir.back(bg.dir)
+        List.filter(x -> x!=back, bias)
     move_one_generic(ghost, move_fun)
 
   @private move_prison(ghost:Ghost.t) =
@@ -111,12 +116,13 @@
       else {ghost with prison = some(t-1)}
 
   move(g:Game.status) =
+    flee = Option.is_some(g.on_steroids)
     ghosts = List.map(
       (gid, ghost) ->
         ghost =
           (match ghost.ai with
            | {dumb} -> move_one_dumb(ghost)
-           | {guard} -> move_one_guard(ghost, g.pacman.base)
+           | {guard} -> move_one_guard(ghost, g.pacman.base, flee)
           ) |> move_prison
         (gid, ghost),
       g.ghosts)
