@@ -64,7 +64,7 @@ check_collision(g:Game.status):Game.status =
         x = gc.f1 - pc.f1
         y = gc.f2 - pc.f2
         d = Math.sqrt_i(x*x+y*y)
-        if d < base_size/2 then some(gid)
+        if d < 2*base_size/3 then some(gid)
         else res,
     g.ghosts, none)
   if Option.is_none(has_collision) then g
