@@ -57,7 +57,6 @@
     (dir, dx, dy) =
       if cur_step != 0 then (p.base.dir, 0, 0)
       else
-        do print_infos(g)
         (dx, dy) = Base.Dir.deltas(p.base.dir)
         (ddx, ddy) = Base.Dir.deltas(p.next_dir)
         dir = test_wall(p.next_dir, Base.Dir.get_still(p.next_dir),
@@ -76,6 +75,7 @@
       if cur_step != p.base.max_steps/2 then (g.food, 0, g.on_steroids)
       else Food.check(pos, g.food, g.on_steroids)
     score = g.score + dscore
+    lives = g.lives + (score/life_points - g.score/life_points)
     on_steroids = match steroids with
       | {none} -> none
       | {some=t} ->
@@ -90,6 +90,6 @@
             mouth_step = mouth
             mouth_incr = dmouth
             base = { p.base with ~pos ~dir ~cur_step } }
-    {g with ~pacman ~food ~score ~on_steroids}
+    {g with ~pacman ~food ~score ~lives ~on_steroids}
 
 }}

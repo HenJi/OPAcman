@@ -52,5 +52,6 @@ type Game.status = {
   ghosts      : list(Ghost.t)
   food        : map(Base.pos, Food.t)
   score       : int
+  lives       : int
   on_steroids : option(int) /* Number of cycles on steroids */
 }

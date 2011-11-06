@@ -6,6 +6,14 @@ fps = 60
 base_size = 32
 grid_width  = List.length(List.head(grid))
 grid_heigth = List.length(grid)
+info_width = 200
+
+food_points = 10
+steroid_points = 100
+steroid_len = 300 /* frames */
+clear_bonus = 500
+life_points = 2500
+
 
 /* Defaults */
 
@@ -14,6 +22,7 @@ default_game = {
   ghosts      = Default.ghosts
   food        = Default.food
   score       = 0
+  lives       = 3
   on_steroids = none
 } : Game.status
 
@@ -44,33 +53,42 @@ default_game = {
   do Canvas.restore(ctx)
   void
 
+check_collision(g) =
+  pc = Base.center(g.pacman.base)
+  has_collision = List.fold(
+    ghost, res ->
+      if res then res
+      else
+        gc = Base.center(ghost.base)
+        x = gc.f1 - pc.f1
+        y = gc.f2 - pc.f2
+        d = Math.sqrt_i(x*x+y*y)
+        d < base_size,
+    g.ghosts, false)
+  if has_collision then {g with lives=0}
+  else g
+
 @client clean_frame(ctx:Canvas.context) =
   Canvas.clear_rect(
     ctx, 0, 0,
-    2+2*base_size*grid_width,
-    2+2*base_size*grid_heigth)
-
-@client print_infos(g:Game.status) =
-  p = g.pacman
-  cont =
-    <>
-      Pacman at ({p.base.pos.x},{p.base.pos.y}), moving {"{p.base.dir}"}
-      - {Map.size(g.food)} food left
-      - Score: {g.score}
-      - Steroids: {g.on_steroids}
-    </>
-  Dom.transform([#info <- cont])
+    2+base_size*grid_width,
+    2+base_size*grid_heigth)
 
 @client next_frame(ctx:Canvas.context)() =
   g = game.get()
-   |> Pacman.move
-   |> Ghost.move
-  do clean_frame(ctx)
-  do Wall.draw(ctx)
-  do Food.draw(g, ctx)
-  do Pacman.draw(g, ctx)
-  do Ghost.draw(g, ctx)
-  game.set(g)
+  if g.lives == 0 then
+    void
+  else
+    g = Pacman.move(g)
+     |> Ghost.move
+     |> check_collision
+    do clean_frame(ctx)
+    do Wall.draw(ctx)
+    do Food.draw(g, ctx)
+    do Pacman.draw(g, ctx)
+    do Ghost.draw(g, ctx)
+    do Info.draw(g, ctx)
+    game.set(g)
 
 @client keyfun(e) =
   g = game.get()
@@ -121,7 +139,7 @@ default_game = {
 body() =
   <>
     <canvas id="game_holder"
-            width="{2+base_size*grid_width}"
+            width="{2+base_size*grid_width+info_width}"
             height="{2+base_size*grid_heigth}">
       You can't see canvas, upgrade your browser !
     </canvas>

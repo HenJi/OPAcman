@@ -5,11 +5,11 @@
     | (food, {none}) -> (food, 0, cur_steroids)
     | (food, {some=f}) ->
       (food, d) =
-        if food == Map.empty then (Default.food, 1000)
+        if food == Map.empty then (Default.food, clear_bonus)
         else (food, 0)
       match f with
-      | {normal} -> (food, 10+d, cur_steroids)
-      | {steroids} -> (food, 100+d, some(300))
+      | {normal} -> (food, food_points+d, cur_steroids)
+      | {steroids} -> (food, steroid_points+d, some(steroid_len))
 
   draw(g, ctx:Canvas.context) =
     food = g.food
