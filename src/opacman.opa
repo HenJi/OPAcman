@@ -18,7 +18,7 @@ life_points = 2500
 /* Defaults */
 
 default_game = {
-  state       = {initiating=2*fps}
+  state       = {game_start}
   pacman      = Default.pacman
   ghosts      = Default.ghosts
   food        = Default.food
@@ -107,11 +107,9 @@ check_collision(g) =
     | {pause} ->
       do blink(->Info.draw_pause(ctx))
       g
-    | {initiating=t} ->
-      if t < -fps/2 then {g with state={running}}
-      else
-        do blink(->Info.draw_init(t, ctx))
-        {g with state={initiating=(t-1)}}
+    | {game_start} ->
+      do blink(->Info.draw_init(ctx))
+      {g with state={game_start}}
     | {running} ->
       Pacman.move(g)
       |> Ghost.move
@@ -152,13 +150,25 @@ check_collision(g) =
     | (_, {some=100}) -> {p with next_dir={right}}
 
     | _ -> p
+  directions = [122, 119, 113, 97, 115, 100]
   g = match (g.state, e.key_code) with
     // r (reset if game over)
     | ({game_over}, {some=114}) -> default_game
 
-    // space (pause toggle)
+    // space (pause start)
     | ({running}, {some=32}) -> {g with state={pause}}
-    | ({pause}, {some=32}) -> {g with state={running}}
+
+    // any direction or space to resume
+    | ({pause}, {some=k}) ->
+      if k == 32 || List.mem(k, directions) then
+        {g with state={running} pacman=p}
+      else g
+
+    // any direction to start game
+    | ({game_start}, {some=k}) ->
+      if List.mem(k, directions) then
+        {g with state={running} pacman=p}
+      else g
 
     | _ -> {g with pacman=p}
   game.set(g)

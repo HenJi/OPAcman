@@ -48,7 +48,7 @@ type Food.t =
   / {steroids}
 
 type Game.state =
-    {initiating:int}
+    {game_start}
   / {running}
   / {pause}
   / {game_over}

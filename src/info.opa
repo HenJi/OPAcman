@@ -73,17 +73,14 @@
     do Canvas.restore(ctx)
     void
 
-  draw_init(t, ctx) =
-    text =
-      if t < 0 then "Go!"
-      else "Starts in {1+t/fps}s"
-    draw_in_center(ctx, text, none)
+  draw_init(ctx) =
+    draw_in_center(ctx, "OPAcman", some("Move in any direction to start"))
 
   draw_game_over(ctx) =
     draw_in_center(ctx, "GAME OVER", some("'r' to restart"))
 
   draw_pause(ctx) =
-    draw_in_center(ctx, "PAUSE", some("'space' to resume"))
+    draw_in_center(ctx, "PAUSE", some("'space' or any direction to resume"))
 
 
 }}
