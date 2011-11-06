@@ -35,21 +35,33 @@
     do Canvas.restore(ctx)
     void
 
+  @private all_options(x,y) = [] : list(Base.direction)
+    |> (if Wall.at(x+1, y, false) then identity
+        else List.add({right}, _))
+    |> (if Wall.at(x-1, y, false) then identity
+        else List.add({left}, _))
+    |> (if Wall.at(x, y+1, false) then identity
+        else List.add({down}, _))
+    |> (if Wall.at(x, y-1, false) then identity
+        else List.add({up}, _))
+
+  @private move_map = List.foldi(
+    y, l, acc ->
+      List.foldi(
+        x, v, acc ->
+          if v != 8 then
+            Map.add(~{x y}, all_options(x,y), acc)
+          else acc,
+        l, acc),
+    grid, Map.empty:map(Base.pos, list(Base.direction)))
+
   @private build_move_options(b:Base.t, no_back) =
-    all_options = [] : list(Base.direction)
-      |> (if Wall.at(b.pos.x+1, b.pos.y, false) then identity
-          else List.add({right}, _))
-      |> (if Wall.at(b.pos.x-1, b.pos.y, false) then identity
-          else List.add({left}, _))
-      |> (if Wall.at(b.pos.x, b.pos.y+1, false) then identity
-          else List.add({down}, _))
-      |> (if Wall.at(b.pos.x, b.pos.y-1, false) then identity
-          else List.add({up}, _))
-    if List.length(all_options) == 1 then all_options
-    else if no_back then
-      back = Base.Dir.back(b.dir)
-      List.filter(x -> x!=back, all_options)
-    else all_options
+      all_options = Map.get(b.pos, move_map) ? []
+      if List.length(all_options) == 1 then all_options
+      else if no_back then
+        back = Base.Dir.back(b.dir)
+        List.filter(x -> x!=back, all_options)
+      else all_options
 
   @private move_one_generic(g:Ghost.t, move_fun) =
     cur_step = g.base.cur_step + 1
