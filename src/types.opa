@@ -51,6 +51,7 @@ type Game.state =
     {game_start}
   / {running}
   / {pause}
+  / {score:string}
   / {game_over}
 
 type Game.status = {
@@ -62,4 +63,5 @@ type Game.status = {
   lives       : int
   on_steroids : option({cycles:int combo:int})
     /* Number of cycles on steroids and ghost combo */
+  scores      : list((int, string))
 }

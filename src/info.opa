@@ -39,6 +39,15 @@
 
     do Canvas.save(ctx)
     do Canvas.set_font(ctx, "bold 20px Arial")
+    do Canvas.translate(ctx, 12+base_size*grid_width, 250)
+    do cft("HIGH SCORES:", 30)
+    do List.iter(
+      (score, name) -> cft(" - {name} {score}", 30),
+      g.scores)
+    do Canvas.restore(ctx)
+
+    do Canvas.save(ctx)
+    do Canvas.set_font(ctx, "bold 20px Arial")
     do Canvas.translate(ctx, 2+base_size*grid_width, 0)
     p = g.pacman.base.pos
     do Canvas.fill_text(ctx,
@@ -58,7 +67,6 @@
     w=2+base_size*grid_width
     h=2+base_size*grid_heigth
     do Canvas.save(ctx)
-
     do Canvas.set_text_align(ctx, {align_center})
     do Canvas.set_font(ctx, "bold {f}px Arial")
     do Canvas.fill_text(ctx, text, w/2, (h-f)/2)
@@ -78,6 +86,31 @@
 
   draw_game_over(ctx) =
     draw_in_center(ctx, "GAME OVER", some("'r' to restart"))
+
+  @private scorify(name) =
+    ll = String.length(name)
+    c1 = if ll < 1 then "_" else String.get(0, name)
+    c2 = if ll < 2 then "_" else String.get(1, name)
+    c3 = if ll < 3 then "_" else String.get(2, name)
+    "{c1} {c2} {c3}"
+
+  draw_score_entry(ctx, name) =
+    f = 70
+    w=2+base_size*grid_width
+    h=2+base_size*grid_heigth
+    do Canvas.save(ctx)
+
+    do Canvas.set_text_align(ctx, {align_center})
+    do Canvas.set_font(ctx, "bold {f}px Arial")
+    do Canvas.fill_text(ctx, "HIGH SCORE", w/2, (h-f)/2)
+
+    do Canvas.set_font(ctx, "bold {f/2}px Arial")
+    do Canvas.fill_text(ctx, "Type your initials, submit with 'enter'", w/2, h/2)
+
+    do Canvas.set_font(ctx, "bold 50px Arial")
+    do Canvas.fill_text(ctx, scorify(name), w/2, h/2+60)    
+    do Canvas.restore(ctx)
+    void
 
   draw_pause(ctx) =
     draw_in_center(ctx, "PAUSE", some("'space' or any direction to resume"))

@@ -12,11 +12,17 @@
         x >= grid_width || y >= grid_heigth || x < 0 || y < 0
     border || Set.mem(~{x y}, Default.walls)
 
-  @private draw_angle(ctx, x, y, angle) =
+  @private common_env(ctx, x, y, f:->void) =
     w = base_size
     do Canvas.save(ctx)
-    do Canvas.set_fill_style(ctx, {color=Color.darkblue})
+    do Canvas.set_fill_style(ctx, {color=Color.lightslategray})
     do Canvas.translate(ctx, 1+x*w+w/2, 1+y*w+w/2)
+    do f()
+    Canvas.restore(ctx)
+
+  @private draw_angle(ctx, x, y, angle) =
+    w = base_size
+    common_env(ctx, x, y, (->
     do Canvas.rotate(ctx, angle)
     do Canvas.begin_path(ctx)
     do Canvas.move_to(ctx, w/4, w/2)
@@ -26,23 +32,19 @@
     do Canvas.line_to(ctx, w/2, -w/4)
     do Canvas.line_to(ctx, w/2, w/4)
     do Canvas.arc(ctx, w/2, w/2, w/4, 3.*Math.PI/2., Math.PI, true)
-    do Canvas.fill(ctx)
-    Canvas.restore(ctx)
+    Canvas.fill(ctx)
+    ))
 
   @private draw_line(ctx, x, y, angle) =
     w = base_size
-    do Canvas.save(ctx)
-    do Canvas.set_fill_style(ctx, {color=Color.darkblue})
-    do Canvas.translate(ctx, 1+x*w+w/2, 1+y*w+w/2)
+    common_env(ctx, x, y, (->
     do Canvas.rotate(ctx, angle)
-    do Canvas.fill_rect(ctx, w/2, w/4, -w, -w/2)
-    Canvas.restore(ctx)
+    Canvas.fill_rect(ctx, w/2, w/4, -w, -w/2)
+    ))
 
   @private draw_corner(ctx, x, y, angle) =
     w = base_size
-    do Canvas.save(ctx)
-    do Canvas.set_fill_style(ctx, {color=Color.darkblue})
-    do Canvas.translate(ctx, 1+x*w+w/2, 1+y*w+w/2)
+    common_env(ctx, x, y, (->
     do Canvas.rotate(ctx, angle)
     do Canvas.begin_path(ctx)
     do Canvas.move_to(ctx, w/4, 0)
@@ -50,14 +52,12 @@
     do Canvas.line_to(ctx, -w/4, w/2)
     do Canvas.line_to(ctx, w/4, w/2)
     do Canvas.line_to(ctx, w/4, 0)
-    do Canvas.fill(ctx)
-    Canvas.restore(ctx)
+    Canvas.fill(ctx)
+    ))
 
   @private draw_t(ctx, x, y, angle) =
     w = base_size
-    do Canvas.save(ctx)
-    do Canvas.set_fill_style(ctx, {color=Color.darkblue})
-    do Canvas.translate(ctx, 1+x*w+w/2, 1+y*w+w/2)
+    common_env(ctx, x, y, (->
     do Canvas.rotate(ctx, angle)
     do Canvas.begin_path(ctx)
     do Canvas.move_to(ctx, w/4, w/2)
@@ -67,14 +67,12 @@
     do Canvas.line_to(ctx, w/2, -w/4)
     do Canvas.line_to(ctx, w/2, w/4)
     do Canvas.arc(ctx, w/2, w/2, w/4, 3.*Math.PI/2., Math.PI, true)
-    do Canvas.fill(ctx)
-    Canvas.restore(ctx)
+    Canvas.fill(ctx)
+    ))
 
   @private draw_cross(ctx, x, y) =
     w = base_size
-    do Canvas.save(ctx)
-    do Canvas.set_fill_style(ctx, {color=Color.darkblue})
-    do Canvas.translate(ctx, 1+x*w+w/2, 1+y*w+w/2)
+    common_env(ctx, x, y, (->
     do Canvas.begin_path(ctx)
     do Canvas.move_to(ctx, w/4, w/2)
     do Canvas.line_to(ctx, -w/4, w/2)
@@ -85,8 +83,16 @@
     do Canvas.arc(ctx, w/2, -w/2, w/4, Math.PI, Math.PI/2., true)
     do Canvas.line_to(ctx, w/2, w/4)
     do Canvas.arc(ctx, w/2, w/2, w/4, 3.*Math.PI/2., Math.PI, true)
-    do Canvas.fill(ctx)
-    Canvas.restore(ctx)
+    Canvas.fill(ctx)
+    ))
+
+  @private draw_circle(ctx, x, y) =
+    w = base_size
+    common_env(ctx, x, y, (->
+    do Canvas.begin_path(ctx)
+    do Canvas.arc(ctx, 0, 0, w/4, 0., 2.*Math.PI, true)
+    Canvas.fill(ctx)
+    ))
 
   @private neighbors(x, y) =
     right = at(x+1, y, true)
@@ -96,7 +102,6 @@
     (top, left, bottom, right)
 
   draw(ctx:Canvas.context) =
-    w = base_size
     do Set.iter(
       ~{x y} ->
         match neighbors(x, y) with
@@ -135,11 +140,8 @@
 
         | ({true}, {true}, {true}, {true}) ->
           draw_cross(ctx, x, y)
-        | _ ->
-          do Canvas.save(ctx)
-          do Canvas.set_fill_style(ctx, {color=Color.darkblue})
-          do Canvas.fill_rect(ctx, 1+x*w, 1+y*w, w, w)
-          Canvas.restore(ctx),
+        | ({false}, {false}, {false}, {false}) ->
+          draw_circle(ctx, x, y),
       Default.walls)
     void
 

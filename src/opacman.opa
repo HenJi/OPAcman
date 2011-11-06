@@ -28,6 +28,7 @@ default_game = {
   score       = 0
   lives       = 3
   on_steroids = none
+  scores      = []
 } : Game.status
 
 /* Game */
@@ -92,15 +93,22 @@ check_collision(g:Game.status):Game.status =
       lives = g.lives + (score/life_points - g.score/life_points)
       {g with ~ghosts ~score ~lives ~on_steroids}
     | {none} ->
-      if g.lives == 1 then
-        {g with
-          state = {game_over}
+      if g.lives < 2 then
+        scores = Scores.get()
+        cur_min =
+          if scores == [] then 0
+          else List.rev(scores) |> List.head |> _.f1
+        state =
+          if g.score > cur_min then {score=""}
+          else {game_over}
+        {g with ~scores ~state
           lives = 0}
       else
         {default_game with
           food = g.food
           score = g.score
-          lives = g.lives-1}
+          lives = g.lives-1
+          scores = Scores.get()}
 
 @client clean_frame(ctx:Canvas.context) =
   Canvas.clear_rect(
@@ -112,7 +120,7 @@ check_collision(g:Game.status):Game.status =
   t = Date.now() |> Date.in_milliseconds
   t = t / 100
   t = t - (t/10)*10
-  if t > 5 then f()
+  if t > 3 then f()
 
 @client next_frame(ctx:Canvas.context)() =
   draw_board(g) =
@@ -127,6 +135,9 @@ check_collision(g:Game.status):Game.status =
   g = match g.state with
     | {game_over} ->
       do blink(->Info.draw_game_over(ctx))
+      g
+    | {score=name} ->
+      do blink(->Info.draw_score_entry(ctx, name))
       g
     | {pause} ->
       do blink(->Info.draw_pause(ctx))
@@ -151,7 +162,7 @@ check_collision(g:Game.status):Game.status =
 @client keyfun(e) =
   g = game.get()
   p = g.pacman
-  do Dom.transform([#debug <- "{e.key_code}"])
+  // do Dom.transform([#debug <- "{e.key_code}"])
   dir_key = key_to_dir(e.key_code ? -1)
   p = match (p.base.dir, dir_key) with
     | ({down}, {some={dir_up}}) ->
@@ -181,7 +192,28 @@ check_collision(g:Game.status):Game.status =
     | _ -> p
   g = match (g.state, e.key_code) with
     // r (reset if game over)
-    | ({game_over}, {some=114}) -> default_game
+    | ({game_over}, {some=82}) ->
+      { default_game with scores=Scores.get() }
+
+    // any letter for high score
+    | ({score=name}, {some=key}) ->
+      if key == 13 then
+        scores = Scores.add(name, g.score)
+        {g with ~scores state={game_over}}
+      else
+        char_idx = key - 65
+        new_char =
+          if char_idx >= 0 && char_idx < 26 then
+            String.get(char_idx, "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+          else ""
+        ll = String.length(name)
+        score =
+          if key == 8 && ll != 0 then
+            String.substring_unsafe(0, ll-1, name)
+          else if new_char == "" then name
+          else if ll < 3 then "{name}{new_char}"
+          else name
+        {g with state={~score}}
 
     // space (pause start)
     | ({running}, {some=32}) -> {g with state={pause}}
@@ -201,7 +233,8 @@ check_collision(g:Game.status):Game.status =
     | _ -> {g with pacman=p}
   game.set(g)
 
-@client init() =
+@client init(scores) =
+  do game.set({game.get() with ~scores})
   do match Canvas.get(#bg_holder) with
     | {none} -> void
     | {some=canvas} ->
@@ -212,12 +245,13 @@ check_collision(g:Game.status):Game.status =
   | {some=canvas} ->
     ctx = Canvas.get_context_2d(canvas) |> Option.get
     t = Scheduler.make_timer(1000/fps, next_frame(ctx))
-    _ = Dom.bind(Dom.select_document(), {keydown}, keyfun)
+    _ = Dom.bind_with_options(Dom.select_document(), {keydown}, keyfun, [{prevent_default}])
     t.start()
 
 body() =
   width = 2+base_size*grid_width+info_width
   height = 2+base_size*grid_heigth
+  scores = Scores.get()
   <>
     <canvas id="bg_holder" width="{width}" height="{height}">
       You can't see canvas, upgrade your browser !
@@ -226,7 +260,7 @@ body() =
       You can't see canvas, upgrade your browser !
     </canvas>
     <div>
-      <span id="info" onready={_ -> init()}></span>
+      <span id="info" onready={_ -> init(scores)}></span>
       <span id="debug"></span>
     </div>
   </>
