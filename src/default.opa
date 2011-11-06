@@ -97,7 +97,7 @@ Default = {{
   @private make_ghost(ai, prison, dir, color, eye_color) =
   ~{x y} = Set.random_get(ghost_prison) |> Option.get
   { ~ai ~color ~eye_color
-    base      = Base.make(x, y, dir, 10)
+    base      = Base.make(x, y, dir, 11)
     prison    = some(prison)
     eye_step  = 0
     eye_steps = 32
