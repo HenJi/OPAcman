@@ -42,7 +42,7 @@
     do Canvas.translate(ctx, 2+base_size*grid_width, 0)
     p = g.pacman.base.pos
     do Canvas.fill_text(ctx,
-      "Move with", 10, info_height-100)
+      "Move with arrows or", 10, info_height-100)
     do Canvas.fill_text(ctx,
       "'wasd' or 'zqsd'", 10, info_height-70)
     do Canvas.fill_text(ctx,

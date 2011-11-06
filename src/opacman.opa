@@ -6,7 +6,7 @@ fps = 60
 base_size = 32
 grid_width  = List.length(List.head(grid))
 grid_heigth = List.length(grid)
-info_width = 200
+info_width = 250
 
 food_points = 10
 steroid_points = 100
@@ -64,7 +64,7 @@ check_collision(g:Game.status):Game.status =
         x = gc.f1 - pc.f1
         y = gc.f2 - pc.f2
         d = Math.sqrt_i(x*x+y*y)
-        if d < base_size then some(gid)
+        if d < base_size/2 then some(gid)
         else res,
     g.ghosts, none)
   if Option.is_none(has_collision) then g
@@ -114,7 +114,6 @@ check_collision(g:Game.status):Game.status =
 @client next_frame(ctx:Canvas.context)() =
   draw_board(g) =
     do clean_frame(ctx)
-    do Wall.draw(ctx)
     do Food.draw(g, ctx)
     do Pacman.draw(g, ctx)
     do Ghost.draw(g, ctx)
@@ -138,41 +137,45 @@ check_collision(g:Game.status):Game.status =
       |> check_collision
   game.set(g)
 
+@client key_to_dir(code:int) =
+  match code with
+  | 38 | 87 | 90 -> some({dir_up})
+  | 40 | 83 -> some({dir_down})
+  | 37 | 65 | 81 -> some({dir_left})
+  | 39 | 68 -> some({dir_right})
+  | _ -> none
+
 @client keyfun(e) =
   g = game.get()
   p = g.pacman
   do Dom.transform([#debug <- "{e.key_code}"])
-  p = match (p.base.dir, e.key_code) with
-    // z + w
-    | ({down}, {some=122}) | ({down}, {some=119}) ->
+  dir_key = key_to_dir(e.key_code ? -1)
+  p = match (p.base.dir, dir_key) with
+    | ({down}, {some={dir_up}}) ->
         {p with next_dir={up}
                 base={p.base with dir={up}
                                   cur_step=-p.base.cur_step}}
-    | (_, {some=122}) -> {p with next_dir={up}}
+    | (_, {some={dir_up}}) -> {p with next_dir={up}}
 
-    // q + a
-    | ({right}, {some=113}) | ({right}, {some=97}) ->
+    | ({right}, {some={dir_left}}) ->
         {p with next_dir={left}
                 base={p.base with dir={left}
                                   cur_step=-p.base.cur_step}}
-    | (_, {some=113}) -> {p with next_dir={left}}
+    | (_, {some={dir_left}}) -> {p with next_dir={left}}
 
-    // s
-    | ({up}, {some=115}) ->
+    | ({up}, {some={dir_down}}) ->
         {p with next_dir={down}
                 base={p.base with dir={down}
                                   cur_step=-p.base.cur_step}}
-    | (_, {some=115}) -> {p with next_dir={down}}
+    | (_, {some={dir_down}}) -> {p with next_dir={down}}
 
-    // d
-    | ({left}, {some=100}) ->
+    | ({left}, {some={dir_right}}) ->
         {p with next_dir={right}
                 base={p.base with dir={right}
                                   cur_step=-p.base.cur_step}}
-    | (_, {some=100}) -> {p with next_dir={right}}
+    | (_, {some={dir_right}}) -> {p with next_dir={right}}
 
     | _ -> p
-  directions = [122, 119, 113, 97, 115, 100]
   g = match (g.state, e.key_code) with
     // r (reset if game over)
     | ({game_over}, {some=114}) -> default_game
@@ -182,13 +185,13 @@ check_collision(g:Game.status):Game.status =
 
     // any direction or space to resume
     | ({pause}, {some=k}) ->
-      if k == 32 || List.mem(k, directions) then
+      if k == 32 || Option.is_some(dir_key) then
         {g with state={running} pacman=p}
       else g
 
     // any direction to start game
-    | ({game_start}, {some=k}) ->
-      if List.mem(k, directions) then
+    | ({game_start}, {some=_}) ->
+      if Option.is_some(dir_key) then
         {g with state={running} pacman=p}
       else g
 
@@ -196,19 +199,27 @@ check_collision(g:Game.status):Game.status =
   game.set(g)
 
 @client init() =
+  do match Canvas.get(#bg_holder) with
+    | {none} -> void
+    | {some=canvas} ->
+      bg_ctx = Canvas.get_context_2d(canvas) |> Option.get
+      Wall.draw(bg_ctx)
   match Canvas.get(#game_holder) with
   | {none} -> void
   | {some=canvas} ->
     ctx = Canvas.get_context_2d(canvas) |> Option.get
     t = Scheduler.make_timer(1000/fps, next_frame(ctx))
-    _ = Dom.bind(Dom.select_document(), {keypress}, keyfun)
+    _ = Dom.bind(Dom.select_document(), {keydown}, keyfun)
     t.start()
 
 body() =
+  width = 2+base_size*grid_width+info_width
+  height = 2+base_size*grid_heigth
   <>
-    <canvas id="game_holder"
-            width="{2+base_size*grid_width+info_width}"
-            height="{2+base_size*grid_heigth}">
+    <canvas id="bg_holder" width="{width}" height="{height}">
+      You can't see canvas, upgrade your browser !
+    </canvas>
+    <canvas id="game_holder" width="{width}" height="{height}">
       You can't see canvas, upgrade your browser !
     </canvas>
     <div>
@@ -220,4 +231,7 @@ body() =
 server = one_page_server("OPAcman", body)
 
 css = css
-  canvas { border: 1px solid black; }
+  canvas {
+    border: 1px solid black;
+    position: absolute;
+  }

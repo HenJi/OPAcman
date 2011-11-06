@@ -30,7 +30,9 @@
         | {normal} ->
           Canvas.fill_rect(ctx, w/2+x*w-2, w/2+y*w-2, 6, 6)
         | {steroids} ->
-          Canvas.fill_rect(ctx, w/2+x*w-5, w/2+y*w-5, 11, 11),
+          blink(
+           -> Canvas.fill_rect(ctx, w/2+x*w-5, w/2+y*w-5, 11, 11)
+          ),
       food)
     do Canvas.restore(ctx)
     void
