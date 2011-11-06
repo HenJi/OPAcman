@@ -71,8 +71,9 @@
       y = mod(grid_heigth + p.base.pos.y + dy, grid_heigth)
     }
 
-    (food, dscore, steroids) =
-      if cur_step != p.base.max_steps/4 then (g.food, 0, g.on_steroids)
+    (food, dscore, steroids, max_steps) =
+      if cur_step != p.base.max_steps/4 then
+        (g.food, 0, g.on_steroids, p.base.max_steps)
       else Food.check(pos, g.food, g.on_steroids)
     score = g.score + dscore
     lives = g.lives + (score/life_points - g.score/life_points)
@@ -89,7 +90,7 @@
       { p with
             mouth_step = mouth
             mouth_incr = dmouth
-            base = { p.base with ~pos ~dir ~cur_step } }
+            base = { p.base with ~pos ~dir ~cur_step ~max_steps} }
     {g with ~pacman ~food ~score ~lives ~on_steroids}
 
 }}

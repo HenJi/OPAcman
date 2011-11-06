@@ -87,7 +87,7 @@ Default = {{
       |> _.f2
 
   pacman = {
-    base       = Base.make(13, 16, {right}, 10)
+    base       = Base.make(13, 16, {right}, pacman_speed)
     next_dir   = {right}
     mouth_step = 0
     mouth_incr = 1
@@ -97,7 +97,7 @@ Default = {{
   @private make_ghost(ai, prison, color, eye_color) =
   ~{x y} = Set.random_get(ghost_prison) |> Option.get
   { ~ai ~color ~eye_color
-    base      = Base.make(x, y, {up}, 11)
+    base      = Base.make(x, y, {up}, ghosts_speed)
     prison    = some(prison)
     eye_step  = 0
     eye_steps = 32

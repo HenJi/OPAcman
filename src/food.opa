@@ -1,14 +1,17 @@
 @client Food = {{
 
   check(pos, food, cur_steroids) =
+    speed =
+      if Option.is_none(cur_steroids) then pacman_speed
+      else pacman_speed_on_steroids
     match Map.extract(pos, food) with
-    | (food, {none}) -> (food, 0, cur_steroids)
+    | (food, {none}) -> (food, 0, cur_steroids, speed)
     | (food, {some=f}) ->
       (food, d) =
         if food == Map.empty then (Default.food, clear_bonus)
         else (food, 0)
       match f with
-      | {normal} -> (food, food_points+d, cur_steroids)
+      | {normal} -> (food, food_points+d, cur_steroids, speed)
       | {steroids} ->
         new_steroids = match cur_steroids with
           | {none} ->
@@ -17,7 +20,8 @@
           | {some=s} ->
             {cycles = s.cycles+steroid_len
              combo = s.combo}
-        (food, steroid_points+d, some(new_steroids))
+        (food, steroid_points+d,
+         some(new_steroids), pacman_speed_on_steroids)
 
   draw(g, ctx:Canvas.context) =
     food = g.food

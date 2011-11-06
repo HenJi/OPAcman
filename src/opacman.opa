@@ -10,10 +10,13 @@ info_width = 250
 
 food_points = 10
 steroid_points = 100
-steroid_len = 5*fps /* frames */
+steroid_len = 6*fps /* frames */
 clear_bonus = 500
 life_points = 2500
 
+pacman_speed = 10
+pacman_speed_on_steroids = 8
+ghosts_speed = 11
 
 /* Defaults */
 
